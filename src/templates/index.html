@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-time DNS Records</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+    </style>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+</head>
+<body>
+    <h1>Real-time DNS Records Created by external-dns</h1>
+    <table id="records-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Rdataset</th>
+                <th>TTL</th>
+            </tr>
+        </thead>
+        <tbody id="records-body">
+            <!-- Rows will be dynamically added here -->
+        </tbody>
+    </table>
+
+    <script>
+        const socket = io();
+
+        // Function to update the table with new DNS records
+        function updateTable(records) {
+            const tableBody = document.getElementById('records-body');
+            tableBody.innerHTML = ''; // Clear existing rows
+
+            records.forEach(record => {
+                const row = document.createElement('tr');
+                const nameCell = document.createElement('td');
+                const rdatasetCell = document.createElement('td');
+                const ttlCell = document.createElement('td');
+
+                nameCell.textContent = record.name;
+                rdatasetCell.textContent = record.rdataset;
+                ttlCell.textContent = record.ttl;
+
+                row.appendChild(nameCell);
+                row.appendChild(rdatasetCell);
+                row.appendChild(ttlCell);
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Listen for 'dns_records' event from the server
+        socket.on('dns_records', (data) => {
+            updateTable(data.records);
+        });
+    </script>
+</body>
+</html>
