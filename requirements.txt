@@ -1,6 +1,6 @@
 pydantic==2.7.0
 pydantic-settings
-Flask==2.0.3
+Flask==2.2.5
 Flask-SocketIO==5.3.4
 dnspython==2.2.1
 Werkzeug==2.0.3
