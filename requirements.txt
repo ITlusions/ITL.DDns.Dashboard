@@ -3,4 +3,4 @@ pydantic-settings
 Flask==2.0.3
 Flask-SocketIO==5.3.4
 dnspython==2.2.1
-Werkzeug==2.0.3
+Werkzeug==3.0.3
