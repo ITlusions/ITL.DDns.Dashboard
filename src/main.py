@@ -49,6 +49,15 @@ def check_dns_resolution(hostname):
         logging.error(f"Failed to resolve {hostname}.")
         return False
 
+def test_dns(host=settings.ns_server, port=settings.ns_server_port, timeout=3):
+    try:
+        socket.setdefaulttimeout(timeout)
+        socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect((host, port))
+        return True
+    except socket.error as ex:
+        print(ex)
+        return False
+
 def get_dns_records():
     logging.info("Attempting to fetch DNS records.")
     
@@ -61,22 +70,26 @@ def get_dns_records():
     try:
         logging.debug(f"Performing zone transfer for {settings.domain} using {settings.ns_server}:{settings.ns_server_port}.")
         zone = dns.zone.from_xfr(
-            dns.query.xfr(settings.ns_server, settings.domain, port=settings.ns_server_port, keyring=keyring)
+            dns.query.xfr(where=settings.ns_server, zone=settings.domain, port=settings.ns_server_port, keyring=keyring,keyalgorithm='hmac-sha256')
         )
         logging.info("Zone transfer successful.")
+    except dns.exception.DNSException as e:
+        logging.error(f"DNS error during zone transfer: {e}")
     except Exception as e:
-        logging.error(f"Error during zone transfer: {e}")
+        logging.error(f"General error during zone transfer: {e}")
         return {'error': str(e)}
 
     # Get all DNS records created by external-dns
     records = []
     for name, node in zone.nodes.items():
-        for rdataset in node.rdatasets:
-            if "external-dns" in str(rdataset):
+        for _record in node.rdatasets:
+            for rdata in _record:
                 record = {
                     'name': name.to_text(),
-                    'rdataset': rdataset.to_text(),
-                    'ttl': rdataset.ttl
+                    'type': dns.rdatatype.to_text(_record.rdtype),
+                    'data': rdata.to_text(),
+                    'rdataset': _record.to_text(),
+                    'ttl': _record.ttl
                 }
                 records.append(record)
                 logging.debug(f"Found record: {record}")
