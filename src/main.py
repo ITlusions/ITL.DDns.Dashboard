@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     ns_server: str = '192.168.1.241'
     ns_server_port: int = 5354
     key_name: str = 'externaldns'
-    key_secret: str = os.getenv("DNS_KEY_SECRET", "eJalv42CfCjaGVOwGukGD5E6gAtNw+tZRFPOqkhFYZU=")  # Load from .env for security
+    key_secret: str = os.getenv("DNS_KEY_SECRET", "yourownkey")  # Load from .env for security
 
     class Config:
         env_prefix = 'DNS_'  # Environment variable prefix
