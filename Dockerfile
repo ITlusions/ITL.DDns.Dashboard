@@ -1,5 +1,5 @@
-# Use an official Python runtime as a base image
-FROM python:3.9-slim
+# Use an official Python runtime based on Alpine as a parent image
+FROM ghcr.io/astral-sh/uv:python3.12-alpine
 
 #Set environment variables for Pydantic (optional for development)
 #ENV DNS_DOMAIN=public.k8s.int.itlusions.com
@@ -16,7 +16,7 @@ COPY ./src /app
 COPY requirements.txt /app
 
 # Install any needed packages specified in requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+RUN uv pip install --no-cache-dir -r requirements.txt --system
 
 # Make port 5000 available to the world outside this container
 EXPOSE 5000
